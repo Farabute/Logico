@@ -1,12 +1,13 @@
+/*             primer punto           */
+
+
 mira(himym,juan).
 mira(futurama,juan).
 mira(got,juan).
 mira(got,nico).
-/*             primer punto           */
-
 mira(starWars,nico).
-mira(starWars,maui).
-mira(onePiece,maui).
+mira(starWars,maiu).
+mira(onePiece,maiu).
 mira(hoc,gaston).
 
 /*
@@ -26,7 +27,7 @@ quiereVer(himym, gaston).
 
 serie(got,[temporada(3,12),temporada(2,10)]).
 serie(himym,[temporada(1,23)]).
-serie(drHouse,[temporada(8,16)])
+serie(drHouse,[temporada(8,16)]).
 /*No definimos madMen ya que no conocemos sus temporadas, principio de universo cerrado(solo es verdadero lo que conocemos)*/
 
 
@@ -58,12 +59,28 @@ leDijo(aye, gaston, got, relacion(amistad, tyrion, dragon)).
 esSpoiler(Serie,muerte(Alguien)):-
     paso(Serie,_,_,muerte(Alguien)).
 
-esSpoiler(Serie,relacion(Vinculo,UnPersonaje,OtroPersonaje):-
+	
+	
+esSpoiler(Serie,relacion(Vinculo,UnPersonaje,OtroPersonaje)):-
     paso(Serie,_,_,relacion(Vinculo,UnPersonaje,OtroPersonaje)).
 
-esSpoiler(starWars,muerte(empereror)).
-esSpoiler(starWars,relacion(parentesco,anakin,rey)).
+/*cuarto punto*/
 
+leSpoileo(UnaPersona,OtraPersona,Serie):-
+    mira(Serie,OtraPersona),
+    leDijo(UnaPersona,OtraPersona,Serie,Suceso),
+	esSpoiler(Serie,Suceso).
+	
+leSpoileo(UnaPersona,OtraPersona,Serie):-
+    quiereVer(Serie,OtraPersona),
+    leDijo(UnaPersona,OtraPersona,Serie,Suceso),
+	esSpoiler(Serie,Suceso).
+	
+/*quinto punto*/
 
-
-
+televidenteResponsable(Persona):-
+	
+	forall(Personas,not(leSpoileo(Persona,Personas,_))).
+	
+	
+	
