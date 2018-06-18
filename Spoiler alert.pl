@@ -5,6 +5,7 @@ mira(himym,juan).
 mira(futurama,juan).
 mira(got,juan).
 mira(got,nico).
+mira(got,maiu).
 mira(starWars,nico).
 mira(starWars,maiu).
 mira(onePiece,maiu).
@@ -33,7 +34,6 @@ serie(drHouse,[temporada(8,16)]).
 
 
 /*                   segundo punto                      */
-
 
 
 
@@ -79,8 +79,13 @@ leSpoileo(UnaPersona,OtraPersona,Serie):-
 /*quinto punto*/
 
 televidenteResponsable(Persona):-
+	leDijo(Persona,_,_,_),
+	forall(leDijo(Persona,OtraPersona,Serie,_),not(leSpoileo(Persona,OtraPersona,Serie))).
 	
-	forall(Personas,not(leSpoileo(Persona,Personas,_))).
+	televidenteResponsable(Persona):-
+	mira(_,Persona),
+	forall(leDijo(Persona,OtraPersona,Serie,_),not(leSpoileo(Persona,OtraPersona,Serie))).
 	
-	
+
+/* Sexto Punto*/
 	
