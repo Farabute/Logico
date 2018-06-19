@@ -29,13 +29,10 @@ quiereVer(himym, gaston).
 serie(got,[temporada(3,12),temporada(2,10)]).
 serie(himym,[temporada(1,23)]).
 serie(drHouse,[temporada(8,16)]).
+
 /*No definimos madMen ya que no conocemos sus temporadas, principio de universo cerrado(solo es verdadero lo que conocemos)*/
 
-
-
-/*                   segundo punto                      */
-
-
+/* segundo punto */
 
 paso(futurama, 2, 3, muerte(seymourDiera)).
 paso(starWars, 10, 9, muerte(emperor)).
@@ -48,57 +45,45 @@ paso(got, 4, 5, relacion(amistad, tyrion, dragon)).
 
 leDijo(gaston, maiu, got, relacion(amistad, tyrion, dragon)).
 leDijo(nico, maiu, starWars, relacion(parentesco, vader, luke)).
-leDijo(nico, juan, got, muerte(tyrion)). 
+leDijo(nico, juan, got, muerte(tyrion)).
 leDijo(aye, juan, got, relacion(amistad, tyrion, john)).
 leDijo(aye, maiu, got, relacion(amistad, tyrion, john)).
 leDijo(aye, gaston, got, relacion(amistad, tyrion, dragon)).
 
 
-/*tercer punto*/
+/* tercer punto */
 
-esSpoiler(Serie,muerte(Alguien)):-
-    paso(Serie,_,_,muerte(Alguien)).
+esSpoiler(Serie,LoQuePaso):-
+    paso(Serie,_,_,LoQuePaso).
 
-	
-	
-esSpoiler(Serie,relacion(Vinculo,UnPersonaje,OtroPersonaje)):-
-    paso(Serie,_,_,relacion(Vinculo,UnPersonaje,OtroPersonaje)).
+/* Permite consultas individuales y existenciales en ambos parámetros. */
 
-/*cuarto punto*/
+/* cuarto punto */
+
+miraOPlaneaVer (Serie, Persona):- mira(Serie, Persona).
+miraOPlaneaVer (Serie, Persona):- quiereVer(Serie, Persona).
 
 leSpoileo(UnaPersona,OtraPersona,Serie):-
-    mira(Serie,OtraPersona),
+    miraOPlaneaVer(Serie, OtraPersona),
     leDijo(UnaPersona,OtraPersona,Serie,Suceso),
-	esSpoiler(Serie,Suceso).
-	
-leSpoileo(UnaPersona,OtraPersona,Serie):-
-    quiereVer(Serie,OtraPersona),
-    leDijo(UnaPersona,OtraPersona,Serie,Suceso),
-	esSpoiler(Serie,Suceso).
-	
-/*quinto punto*/
+    esSpoiler(Serie,Suceso).
+
+/* quinto punto*/
 
 televidenteResponsable(Persona):-
 	leDijo(Persona,_,_,_),
 	forall(leDijo(Persona,OtraPersona,Serie,_),not(leSpoileo(Persona,OtraPersona,Serie))).
-	
-	televidenteResponsable(Persona):-
+
+televidenteResponsable(Persona):-
 	mira(_,Persona),
 	forall(leDijo(Persona,OtraPersona,Serie,_),not(leSpoileo(Persona,OtraPersona,Serie))).
-	
 
-/* Sexto Punto*/
-	
+/* sexto Punto*/
+
 vieneZafando(Serie,Persona):-
   miraOPlaneaVer(Serie,Persona),
   not(leSpoileo(_,Persona,Serie)),
   esPopularOPasaronCosasFuertes(Serie).
-
-miraOPlaneaVer(Serie,Persona):-
-  mira(Serie,Persona).
-
-miraOPlaneaVer(Serie,Persona):-
-  quiereVer(Serie, Persona).
 
 esPopularOPasaronCosasFuertes(Serie):-
   seriePopular(Serie).
@@ -107,3 +92,58 @@ esPopularOPasaronCosasFuertes(Serie):-
   serie(Serie,[temporada(Temporada,_)]),
   paso(Serie,Temporada,_,_).
 
+/* septimo Punto*/
+
+:- begin_tests( spoiler_alert).
+
+    % Test tercer punto
+
+    test( esSpoilerMuerteEmperorEnStarWars , nondet ) :-
+      esSpoiler( starWars , muerte(emperor)).
+
+    test( esSpoilerMuertePedroEnStarWars , nondet ) :-
+      not(esSpoiler( starWars , muerte( pedro ))).
+
+    test( esSpoilerParentescoAnakinReyEnStarWars , nondet ) :-
+      esSpoiler( starWars , relacion( parentesco , anakin , rey )).
+
+    test( esSpoilerParentescoAnakinLavezziEnStarWars , nondet ) :-
+      not( esSpoiler( starWars , relacion( parentesco , anakin , lavezzi ))).
+
+    % Test cuarto punto
+
+    test( leSpoileoGastonAMaiuGoT , nondet ) :-
+      leSpoileo( gaston , maiu , got ).
+
+    test( leSpoileoNicoAMaiuStarWars , nondet ) :-
+      leSpoileo( nico , maiu , starWars ).
+
+    % Test quinto Punto
+
+    test( juanEsTelevidenteResponsable , nondet ):-
+      televidenteResponsable( juan ).
+
+    test( ayeEsTelevidenteResponsable , nondet ):-
+      televidenteResponsable( aye ).
+
+    test( mauiEsTelevidenteResponsable , nondet ):-
+      televidenteResponsable( maui ).
+
+    test( nicoNoEsTelevidenteResponsable , nondet ):-
+      not( televidenteResponsable( nico )).
+
+    test( gastonNoEsTelevidenteResponsable , nondet ):-
+      not( televidenteResponsable( gaston )).
+
+    % Test sexto Punto
+
+    test( maiuNoVieneZafando , nondet ):-
+      not( vieneZafando(_,maiu)).
+
+    test( juanVieneZafando , set( Serie == [ himym , got , hoc ])):-
+      vieneZafando( Serie , juan ).
+
+    test( soloNicoVieneZafandoConStarWars , nondet):-
+      vieneZafando( starWars , nico ).
+
+:-end_tests(spoiler_alert).
