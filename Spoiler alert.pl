@@ -89,3 +89,21 @@ televidenteResponsable(Persona):-
 
 /* Sexto Punto*/
 	
+vieneZafando(Serie,Persona):-
+  miraOPlaneaVer(Serie,Persona),
+  not(leSpoileo(_,Persona,Serie)),
+  esPopularOPasaronCosasFuertes(Serie).
+
+miraOPlaneaVer(Serie,Persona):-
+  mira(Serie,Persona).
+
+miraOPlaneaVer(Serie,Persona):-
+  quiereVer(Serie, Persona).
+
+esPopularOPasaronCosasFuertes(Serie):-
+  seriePopular(Serie).
+
+esPopularOPasaronCosasFuertes(Serie):-
+  serie(Serie,[temporada(Temporada,_)]),
+  paso(Serie,Temporada,_,_).
+
