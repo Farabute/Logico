@@ -17,10 +17,10 @@ mira(pedro,got).
 /*        Justificación
 
 Como nadie mira Mad Men no lo modelaremos por Principio de Universo Cerrado, según el cual toda información que no se agregue
-a la base de conocimientos se asume falsa. Esto funciona ya que consultar "mira(madMen, alguien)." debería dar falso,
+a la base de conocimientos se asume falsa. Esto funciona ya que consultar "mira(alguien, madMen)." debería dar falso,
 sea quien sea ese alguien.
 Análogamente no tiene sentido modelar el hecho de que Alf no mira ninguna serie por el mismo principio, puesto que Alf no se
-relaciona con ninguna serie. De modo que consultar "mira(serie, alf)." resultaría correctamente falso para cualquier serie.
+relaciona con ninguna serie. De modo que consultar "mira(alf, serie)." resultaría correctamente falso para cualquier serie.
 */
 
 seriePopular(got).
@@ -95,28 +95,35 @@ esSpoiler(Serie,LoQuePaso):-
 /*        Justificación
 
 Permite consultas individuales y existenciales en ambos parámetros, de modo que se trata de un predicado inversible.
+
+Se denomina consulta individual a aquella en la que los individuos vienen definidos en la consulta, y para la cual se busca
+una solución en la base de conocimientos que la verifique.
+Asimismo, se entiende por consulta existencial a aquella en la que intervienen variables (anónimas o no) para consultar si
+existe una solución individual que, al reemplazarla por la variable, coincida con algo definido en la base de conocimientos.
+Si es así, se unificará el valor hallado a la variable y se informará por consola. Opcionalmente puede preguntarse por otra
+solución que haga verdadera la consulta (con ";"), y la consola las irá informando de a una por vez.
+
 INDIVIDUALES:
 1. Puede consultarse si una serie particular se corresponde con un spoiler particular.
-	Ej. 1A: "esSpoiler(starWars, muerte(emperor)).", para ver si la muerte de emperor ocurrió en Star Wars y es un spoiler.
+	Ej. 1: "esSpoiler(starWars, muerte(emperor)).", para ver si la muerte de emperor ocurrió en Star Wars y es un spoiler.
 EXISTENCIALES:
 2. Si hay algún spoiler para alguna serie en particular, mediante el uso de variable anónima en el segundo parámetro
   (recordando que la misma muestra True si encuentra algo en ese lugar que verifique el predicado, y False en caso contrario).
-	Ej. 2A: "esSpoiler(futurama,_).", para consultar si existe algún spoiler de Futurama en la base de conocimientos.
-3. Todos los spoilers que existen para una serie en particular, utilizando una variable normal en el segundo parámetro.
-   Esto muestra el argumento que hace verdadero esa consulta (si es que hay alguno), y mediante ";" se puede buscar otro, hasta
+	Ej. 2: "esSpoiler(futurama,_).", para consultar si existe algún spoiler de Futurama en la base de conocimientos.
+3. Algún spoiler (si hay) para una serie en particular, utilizando una variable normal en el segundo parámetro.
+   Esto muestra el argumento que hace verdadera esa consulta (si es que hay alguno), y mediante ";" se puede buscar otro, hasta
    que no se hallen más (en cuyo caso se muestra False).
-	 Ej. 3A: "esSpoiler(himym, Spoiler)." sirve para consultar por algún spoiler para himym; luego de encontrarlo se puede
-            presionar ";" para buscar otro, y así pasando por todos hasta llegar a que no haya más (False).
-4. Todas las series que tienen algún tipo determinado de spoiler (muerte/parentesco). Acá se combinan variable normal en el
+	Ej. 3: "esSpoiler(himym, Spoiler)." sirve para consultar por algún spoiler para himym; luego de encontrarlo se puede
+            	presionar ";" para buscar otro, y así pasando por todos hasta llegar a que no haya más (False).
+4. Alguna serie (si hay) con un tipo determinado de spoiler (muerte/relacion). Acá se combinan variable normal en el
    primer parámetro (por querer saber específicamente qué series cumplen el requisito), con variable anónima en el/los "argumentos"
    del functor (siendo que no nos interesa quién murió, o entre quiénes es la relación).
-	 Ej. 4A: "esSpoiler(Serie, muerte(_))." cumple la función de mostrar todas las series en las que muere alguien, sin importar quién.
-	 Ej. 4B: "esSpoiler(Serie, relacion(parentesco,_,_))." se ocupa de mostrar todas las series en las que hay una relación de
-           parentesco, no importa entre quienes.
-5. Todos los pares posibles de series con sus respectivos spoilers. Para esto se usan dos variables normales, ya que queremos que
-   nos muestre todos los pares de elementos que verifiquen el predicado.
-	Ej. 5A: "esSpoiler(Serie, Spoiler)." muestra Serie y Spoiler igualados a cada uno de los casos existentes en la base de
-          conocimientos, de a uno por vez.
+	Ej. 4: "esSpoiler(Serie, relacion(parentesco,_,_))." se ocupa de mostrar alguna serie en la que haya una relación de
+           	parentesco, no importa entre quiénes.
+5. Un par posible de una serie con su respectivo spoiler (si hay). Para esto se usan dos variables normales, ya que queremos que
+   nos muestre un par de elementos que verifique el predicado. Esto podría servir si se quiere ver todos los spoilers que existen
+   en la base de conocimientos, de a uno por vez.
+	Ej. 5: "esSpoiler(Serie, Spoiler)." muestra Serie y Spoiler igualados a un caso existente en la base de conocimientos.
 */
 
 
@@ -143,25 +150,27 @@ leSpoileo(PersonaSpoiler, PersonaQueQuiereVer, Serie):-
 /*        Justificación
 
 Permite consultas individuales y existenciales en los tres parámetros, de modo que se trata de un predicado inversible.
+
+Un predicado se llama inversible para un parámetro cuando es posible poner en ese lugar una variable sin unificar, y que
+el motor la unifique a información útil en términos de lo que se está consultando (léase definición de consulta individual,
+existencial y variable anónima en la justificación del punto 3).
+
 INDIVIDUALES:
 6. Puede consultarse si dos personas se relacionan con un spoiler particular.
 	Ej. 6A: "leSpoileo(gaston, maiu, got).", si queremos saber si Gastón le spoileó GoT a Maiu.
 EXISTENCIALES:
 7. Si hay alguien que haya/fue spoileado; o bien si hubo una serie spoileada. Esto se consulta poniendo ese parámetro y
    llenando con variable anónima los otros dos (dado que nos interesa si existió algún caso o no, sin más detalle).
-	 Ej. 7A: "leSpoileo(nico,_,_).", para saber si Nico spoileó a alguien.
-	 Ej. 7B: "leSpoileo(_, maiu,_).", para saber si Maiu fue spoileada por alguien.
-	 Ej. 7C: "leSpoileo(_,_, drHouse).", para saber si alguien spoileó algo de Dr. House.
-8. Todos las instancias en las que alguien haya/haya sido spoileado, o bien todas en las que una serie haya sido spoileada.
+	Ej. 7: "leSpoileo(_,_, drHouse).", para saber si alguien spoileó algo de Dr. House.
+8. Alguna instancia (si hay) en la que alguien haya/haya sido spoileado, o bien en la que una serie haya sido spoileada.
    Se consulta poniendo ese parámetro y llenando con variable normal los otros dos (puesto que queremos saber qué valores de
    éstos últimos satisfacen el predicado).
-	 Ej. 8A: "leSpoileo(alf, OtraPersona, Serie)." para consultar todas las series que Alf spoileó, y a quienes.
-	 Ej. 8B: "leSpoileo(UnaPersona, maiu, Serie)." para consultar quienes spoilearon a Maiu, y qué series.
-	 Ej. 8C: "leSpoileo(UnaPersona, OtraPersona, got)." para consultar entre qué personas se spoilearon GoT.
-9. Todas las ternas posibles de dos personas y un spoiler. Acá se consulta usando tres variables normales, pues queremos
-   saber todas las combinaciones que hayan y los valores que hacen verdadero al predicado.
-	 Ej. 9A: "leSpoileo(UnaPersona, OtraPersona, Serie)." muestra todas las ternas de dos personas y una serie igualados a cada
-           uno de los casos existentes en la base de conocimientos, de a uno por vez.
+	Ej. 8: "leSpoileo(UnaPersona, maiu, Serie)." para consultar un caso en el que spoilearon a Maiu, y qué serie.
+9. Una terna posible de dos personas y un spoiler (si hay). Acá se consulta usando tres variables normales, pues queremos
+   conocer tres valores que hagan verdadero al predicado. Esto podría servir para ver, una por una, todas las combinaciones
+   que hayan.
+	Ej. 9: "leSpoileo(UnaPersona, OtraPersona, Serie)." muestra alguna terna de dos personas y una serie existente en la
+		base de conocimientos.
 */
 
 
@@ -185,14 +194,13 @@ televidenteResponsable(Persona):-
 
 /* sexto Punto */
 
-%pasoAlgoFuerte(Serie,Temporada):- paso(Serie, Temporada, _, muerte(_)).
-%pasoAlgoFuerte(Serie,Temporada):- paso(Serie, Temporada, _, relacion(amorosa, _, _)).
-%pasoAlgoFuerte(Serie,Temporada):- paso(Serie, Temporada, _, relacion(parentesco, _, _)).
-%Modificacion para la segunda parte del tp
-
 pasaronCosasFuertes(Serie):-
     temporardaYSusEpisodios(Serie,_,_),
-    forall(temporardaYSusEpisodios(Serie,Temporada,_),(paso(Serie,Temporada,_,Suceso),cosaFuerte(Serie,Suceso))).
+    forall(temporardaYSusEpisodios(Serie,Temporada,_), pasoAlgoFuerteEnTemporada(Serie, Temporada)).
+    
+pasoAlgoFuerteEnTemporada(Serie, Temporada):-
+  paso(Serie, Temporada, _, Suceso),
+  cosaFuerte(Serie, Suceso).
 
 vieneZafando(Persona, Serie):-
   miraOPlaneaVer(Persona, Serie),
@@ -224,13 +232,12 @@ esPopularOPasaronCosasFuertes(Serie):-
 /*             primer punto           */
 
 malaGente(Persona):-
-  persona(Persona),
   spoileoATodos(Persona).
 malaGente(Persona):-
-  persona(Persona),
   spoileoYNoMira(Persona,_,_).
 
 spoileoATodos(Spoilero):-
+  persona(Spoilero),
   forall(leDijo(Spoilero, Persona,Serie,_),
   leSpoileo(Spoilero, Persona, Serie)).
 
@@ -253,17 +260,21 @@ spoileoYNoMira(Spoilero,Persona,Serie):-
 
 /*             segundo punto           */
 
-esCliche( Serie, PalabraClave):-
-    forall(member(Palabra,PalabraClave), (paso(Serie2,_,_,plotTwist(PalabraClave2)), member(Palabra,PalabraClave2), Serie\=Serie2)).
+pasoAlFinalDeTemporada(Serie, Suceso):-
+  paso(Serie, Temporada, Episodio, Suceso),
+  temporardaYSusEpisodios(Serie, Temporada, Episodio).
 
-cosaFuerte(Serie, Suceso) :- paso(Serie,_,_,_), Suceso = muerte(_).
-cosaFuerte(Serie, Suceso) :- paso(Serie,_,_,_), Suceso = relacion(amorosa,_,_).
-cosaFuerte(Serie, Suceso) :- paso(Serie,_,_,_), Suceso = relacion(parentesco,_,_).
-cosaFuerte(Serie, Suceso) :-
-    paso(Serie,Temporada,Episodio,_),
-    temporardaYSusEpisodios(Serie,Temporada,Episodio),
-    Suceso = plotTwist(PalabrasClave),
-    not(esCliche(Serie,PalabrasClave)).
+esCliche(plotTwist([PalabrasClave])):-
+    paso(Serie,_,_, plotTwist([PalabrasClave])),
+    forall(member(Palabra, PalabrasClave), (paso(Serie2,_,_,plotTwist([PalabrasClave2])), member(Palabra, PalabrasClave2), Serie \= Serie2)).
+
+
+cosaFuerte(Serie, muerte(Personaje)) :- paso(Serie,_,_, muerte(Personaje)).
+cosaFuerte(Serie, relacion(amorosa, Personaje1, Personaje2)) :- paso(Serie,_,_, relacion(amorosa, Personaje1, Personaje2)).
+cosaFuerte(Serie, relacion(parentesco, Personaje1, Personaje2)) :- paso(Serie,_,_,relacion(parentesco, Personaje1, Personaje2)).
+cosaFuerte(Serie, plotTwist([PalabrasClave])) :-
+    pasoAlFinalDeTemporada(Serie, plotTwist([PalabrasClave])),
+    not(esCliche(plotTwist([PalabrasClave]))).
 
 
 :- begin_tests( cosasFuertes).
