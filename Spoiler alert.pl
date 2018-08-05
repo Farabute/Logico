@@ -157,7 +157,7 @@ existencial y variable anónima en la justificación del punto 3).
 
 INDIVIDUALES:
 6. Puede consultarse si dos personas se relacionan con un spoiler particular.
-	Ej. 6A: "leSpoileo(gaston, maiu, got).", si queremos saber si Gastón le spoileó GoT a Maiu.
+	Ej. 6: "leSpoileo(gaston, maiu, got).", si queremos saber si Gastón le spoileó GoT a Maiu.
 EXISTENCIALES:
 7. Si hay alguien que haya/fue spoileado; o bien si hubo una serie spoileada. Esto se consulta poniendo ese parámetro y
    llenando con variable anónima los otros dos (dado que nos interesa si existió algún caso o no, sin más detalle).
@@ -319,11 +319,17 @@ popularidad(Serie,Popularidad):-
     miranOConversan(Serie,leDijo(_,_,Serie,_),Cantidad2),
     Popularidad is Cantidad1 * Cantidad2.
 
+popularidadBase(BaseDePopularidad):-
+    popularidad(starWars, BaseDePopularidad).
+
+serie(Serie):-
+    miraOPlaneaVer(_,Serie).
+
 popular(Serie):-
-    miraOPlaneaVer(_,Serie),
+    serie(Serie),
     popularidad(Serie, PopularidadSerie),
-    popularidad(starWars,PopularidadStarWars),
-    PopularidadSerie >= PopularidadStarWars.
+    popularidadBase(BaseDePopularidad),
+    PopularidadSerie >= BaseDePopularidad.
 
 popular(hoc).
 
@@ -343,7 +349,6 @@ amigo(maiu, juan).
 amigo(juan, aye).
 
 fullSpoil(Persona1, Persona2):-
-    amigo(Persona1, Persona2),
     leSpoileo(Persona1, Persona2, _),
     Persona1 \= Persona2.
 
